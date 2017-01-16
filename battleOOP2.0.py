@@ -13,7 +13,6 @@ class Board():
     def changeBoardHit(self, row, col): self.board[row][col] = '*'
 
     def changeBoardShip(self, ship):
-        print(ship)
         if len(ship) == 1:
             for coord in ship:
                 col, row = coord
@@ -112,7 +111,7 @@ class Player(Board):
 
         self.ships.append(ship)
 
-    def getMove(self, obj):
+    def getMove(self, enemy):
 
         move = input('Ход игрока {} (пример ввода: а-1): '.format(self.name)).split('-')
         try:
@@ -122,7 +121,7 @@ class Player(Board):
             cont()
             return False
 
-        if len(move) < 2 or len(move[0]) > 1 or move[1] > 26 or move[0] not in string.ascii_letters or move[1] <= 0:
+        if len(move) < 2 or len(move[0]) > 1 or move[1] > 26 or move[0] not in string.ascii_letters or move[1] < 0:
             print('Неверный ввод!')
             cont()
             return False
@@ -141,10 +140,13 @@ class Player(Board):
 
         else:
             print(move)
-            for ship in obj.ships:
+            for ship in enemy.ships:
                 print(ship)
                 if move in ship:
-                    print('Попал!')
+                    print('Попал')
+                    enemy.changeBoardHit(move[0], move[1])
+                    self.getMove(enemy)
+
             else:
                 print('Переход хода')
 
@@ -201,16 +203,19 @@ class Game():
 
 
                 players = [player1, player2]
-
+                for player in players:
+                    for _ in range(2):
+                        clear()
+                        print('Расстановка кораблей для {}'.format(player.name))
+                        player.printBoard()
+                        player.setShip()
+                        for ship in player.ships:
+                            player.changeBoardShip(ship)
                 while True:
+                    i = 1
                     for player in players:
-                        for _ in range(2):
-                            clear()
-                            print('Расстановка кораблей для {}'.format(player.name))
-                            player.printBoard()
-                            player.setShip()
-                            for ship in player.ships:
-                                player.changeBoardShip(ship)
+                        player.getMove(players[i])
+                        i -= 1
 
 
 
