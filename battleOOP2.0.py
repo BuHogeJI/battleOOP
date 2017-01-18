@@ -34,13 +34,16 @@ class Board():
     def printBoard(self):
         print('  ', end = ' ')
         for i in range(self.y):
-            print (string.ascii_letters[i], '{:^50}'.format(' '), string.ascii_letters[i], end = ' ')
+            print (string.ascii_letters[i], end = ' ')
+        print('{:^25}'.format(' '), end = ' ')
+        for i in range(self.y):
+            print(string.ascii_letters[i], end = ' ')
         print()
-        for i,j,k in enumerate(self.board), self.enemy_board:
+        for i,j in enumerate(self.board):
             if i < 9:
-                print('0' + str(i + 1), ' '.join(j), '{:^50}'.format(' '), ' '.join(k))
+                print('0' + str(i + 1), ' '.join(j), '{:^22}'.format(' '), '0' + str(i + 1), ' '.join(self.enemy_board[i]))
             else:
-                print(i + 1, ' '.join(j), '{:^50}'.format(' '), ' '.join(k))
+                print(i + 1, ' '.join(j), '{:^22}'.format(' '), i + 1, ' '.join(self.enemy_board[i]))
 
 class Player(Board):
 
