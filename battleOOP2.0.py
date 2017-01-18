@@ -8,9 +8,13 @@ class Board():
         self.board = [['#'] * self.y for _ in range(self.x)]
         return self.board
 
-    def changeBoardMiss(self, row, col): self.board[row][col] = 'X'
+    def setEnemyBoard(self):
+        self.enemy_board = [['#'] * self.y for _ in range(self.x)]
+        return self.enemy_board
 
-    def changeBoardHit(self, row, col): self.board[row][col] = '*'
+    def changeBoardMiss(self, row, col): self.board[row][col] = '*'
+
+    def changeBoardHit(self, row, col): self.board[row][col] = 'X'
 
     def changeBoardShip(self, ship):
         if len(ship) == 1:
@@ -30,13 +34,13 @@ class Board():
     def printBoard(self):
         print('  ', end = ' ')
         for i in range(self.y):
-            print (string.ascii_letters[i], end = ' ')
+            print (string.ascii_letters[i], '{:^50}'.format(' '), string.ascii_letters[i], end = ' ')
         print()
-        for i,j in enumerate(self.board):
+        for i,j,k in enumerate(self.board), self.enemy_board:
             if i < 9:
-                print('0' + str(i + 1), ' '.join(j))
+                print('0' + str(i + 1), ' '.join(j), '{:^50}'.format(' '), ' '.join(k))
             else:
-                print(i + 1, ' '.join(j))
+                print(i + 1, ' '.join(j), '{:^50}'.format(' '), ' '.join(k))
 
 class Player(Board):
 
@@ -81,35 +85,44 @@ class Player(Board):
         size = int(input('Выберите размер корабля\n1. 1-палубный\n2. 2-палубный\n3. 3-палубный\n4. 4-палубный\n\nВыбор: '))
 
         if size == 1:
-            coords = input('Введите координаты (пример: a-1): ')
-            coords = [coords]
-            if getShip(coords) != False:
-                ship = getShip(coords)
-            else:
-                return False
+            print('Необходимо ввести 4 1-палубных корабля')
+            for _ in range(4):
+                coords = input('Введите координаты (пример: a-1): ')
+                coords = [coords]
+                if getShip(coords) != False:
+                    ship = getShip(coords)
+                    self.ships.append(ship)
+                else:
+                    return False
 
         elif size == 2:
-            coords = input('Введите координаты (пример: a-1;a-2): ').split(';')
-            if getShip(coords) != False:
-                ship = getShip(coords)
-            else:
-                return False
+            print('Необходимо ввести 3 2-палубных корабля')
+            for _ in range(3):
+                coords = input('Введите координаты (пример: a-1;a-2): ').split(';')
+                if getShip(coords) != False:
+                    ship = getShip(coords)
+                    self.ships.append(ship)
+                else:
+                    return False
 
         elif size == 3:
-            coords = input('Введите координаты (пример: a-1;a-2;a-3): ').split(';')
-            if getShip(coords) != False:
-                ship = getShip(coords)
-            else:
-                return False
+            print('Необходимо ввести 2 3-палубных корабля')
+            for _ in range(2):
+                coords = input('Введите координаты (пример: a-1;a-2;a-3): ').split(';')
+                if getShip(coords) != False:
+                    ship = getShip(coords)
+                    self.ships.append(ship)
+                else:
+                    return False
 
         elif size == 4:
+            print('Необходимо ввести 1 4-палубный корабль')
             coords = input('Введите координаты (пример: a-1;a-2;a-3;a-4): ').split(';')
             if getShip(coords) != False:
                 ship = getShip(coords)
+                self.ships.append(ship)
             else:
                 return False
-
-        self.ships.append(ship)
 
     def getMove(self, enemy):
 
@@ -139,16 +152,17 @@ class Player(Board):
             return False
 
         else:
-            print(move)
             for ship in enemy.ships:
-                print(ship)
                 if move in ship:
                     print('Попал')
                     enemy.changeBoardHit(move[0], move[1])
+                    self.enemy_board[move[0], move[1]] = 'X'
                     self.getMove(enemy)
 
             else:
-                print('Переход хода')
+                self.enemy_board[move[0], move[1]] = '*'
+                enemy.changeBoardMiss(move[0], move[1])
+                print('Мимо')
 
 class Game():
 
@@ -199,12 +213,14 @@ class Game():
                 player1 = Player(player1_name, int(size[0]), int(size[1]))
                 player2 = Player(player2_name, int(size[0]), int(size[1]))
                 player1.setBoard()
+                player1.setEnemyBoard()
+                player2.setEnemyBoard()
                 player2.setBoard()
 
 
                 players = [player1, player2]
                 for player in players:
-                    for _ in range(2):
+                    for _ in range(4):
                         clear()
                         print('Расстановка кораблей для {}'.format(player.name))
                         player.printBoard()
