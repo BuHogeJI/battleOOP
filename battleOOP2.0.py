@@ -159,11 +159,11 @@ class Player(Board):
                 if move in ship:
                     print('Попал')
                     enemy.changeBoardHit(move[0], move[1])
-                    self.enemy_board[move[0], move[1]] = 'X'
+                    self.enemy_board[move[0]][move[1]] = 'X'
                     self.getMove(enemy)
 
             else:
-                self.enemy_board[move[0], move[1]] = '*'
+                self.enemy_board[move[0]][move[1]] = '*'
                 enemy.changeBoardMiss(move[0], move[1])
                 print('Мимо')
 
@@ -223,7 +223,7 @@ class Game():
 
                 players = [player1, player2]
                 for player in players:
-                    for _ in range(4):
+                    for _ in range(1):
                         clear()
                         print('Расстановка кораблей для {}'.format(player.name))
                         player.printBoard()
