@@ -51,22 +51,14 @@ class Player(Board):
         super().__init__(x, y)
         self.name = name
         self.ships = []
+        self.choosen = []
         self.status = False
         self.win = False
 
     def setShip(self):
 
-        def checkCoord(coord):
-            if coord[0] > self.y or coord[1] > self.x or coord[0] < 0 or coord[1] < 0:
-                return False
-
-            for ship in self.ships:
-                if coord in ship: # or coord[0] == ship[0] + 1 or coord[0] == ship[0] - 1 or coord[1] == ship[1] - 1 or coord[1] == ship[1] + 1:
-                    return False
-            return True
-
-        def getShip(coords):
-            ship = []
+        def modCoords(coords):
+            res = []
             for coord in coords:
                 coord = coord.split('-')
                 coord[1] = int(coord[1]) - 1
@@ -76,6 +68,27 @@ class Player(Board):
                         coord[0] = i
                         break
                     i += 1
+                res.append([coord[0], coord[1]])
+            return res
+
+        def checkCoord(coord):
+            if coord[0] > self.y or coord[1] > self.x or coord[0] < 0 or coord[1] < 0:
+                return False
+
+            for ship in self.ships:
+                if coord in ship or [coord[0] - 1, coord[1]] in ship or [coord[0], coord[1] - 1] in ship or [coord[0] - 1, coord[1] - 1] in ship or [coord[0] + 1, coord[1]] in ship or [coord[0], coord[1] + 1] in ship or [coord[0] + 1, coord[1] + 1] in ship:
+                    return False
+            return True
+
+        def getShip(coords):
+            ship = []
+            if len(coords) > 1:
+                for i in range(len(coords) - 1):
+                    if coords[i][0] + 1 != coords[i+1][0] or coords[i][0] - 1 != coords[i+1][0] or coords[i][1] + 1 != coords[i+1][1] or coords[i][1] - 1 != coords[i+1][1]:
+                        print('Нельзя разрывать корабль!')
+                        cont()
+                        return False
+            for coord in coords:
                 if checkCoord(coord):
                     ship.append(coord)
                 else:
@@ -86,12 +99,16 @@ class Player(Board):
             return ship
 
         size = int(input('Выберите размер корабля\n1. 1-палубный\n2. 2-палубный\n3. 3-палубный\n4. 4-палубный\n\nВыбор: '))
-
         if size == 1:
+            if size in self.choosen:
+                return False
+            self.choosen.append(size)
             print('Необходимо ввести 4 1-палубных корабля')
             for _ in range(4):
                 coords = input('Введите координаты (пример: a-1): ')
                 coords = [coords]
+                coords = modCoords(coords)
+                print(coords)
                 if getShip(coords) != False:
                     ship = getShip(coords)
                     self.ships.append(ship)
@@ -99,9 +116,13 @@ class Player(Board):
                     return False
 
         elif size == 2:
+            if size in self.choosen:
+                return False
+            self.choosen.append(size)
             print('Необходимо ввести 3 2-палубных корабля')
             for _ in range(3):
                 coords = input('Введите координаты (пример: a-1;a-2): ').split(';')
+                coords = modCoords(coords)
                 if getShip(coords) != False:
                     ship = getShip(coords)
                     self.ships.append(ship)
@@ -109,9 +130,13 @@ class Player(Board):
                     return False
 
         elif size == 3:
+            if size in self.choosen:
+                return False
+            self.choosen.append(size)
             print('Необходимо ввести 2 3-палубных корабля')
             for _ in range(2):
                 coords = input('Введите координаты (пример: a-1;a-2;a-3): ').split(';')
+                coords = modCoords(coords)
                 if getShip(coords) != False:
                     ship = getShip(coords)
                     self.ships.append(ship)
@@ -119,8 +144,12 @@ class Player(Board):
                     return False
 
         elif size == 4:
+            if size in self.choosen:
+                return False
+            self.choosen.append(size)
             print('Необходимо ввести 1 4-палубный корабль')
             coords = input('Введите координаты (пример: a-1;a-2;a-3;a-4): ').split(';')
+            coords = modCoords(coords)
             if getShip(coords) != False:
                 ship = getShip(coords)
                 self.ships.append(ship)
@@ -128,7 +157,8 @@ class Player(Board):
                 return False
 
     def getMove(self, enemy):
-
+        clear()
+        self.printBoard()
         move = input('Ход игрока {} (пример ввода: а-1): '.format(self.name)).split('-')
         try:
             move[1] = int(move[1]) - 1
@@ -223,7 +253,7 @@ class Game():
 
                 players = [player1, player2]
                 for player in players:
-                    for _ in range(1):
+                    for _ in range(2):
                         clear()
                         print('Расстановка кораблей для {}'.format(player.name))
                         player.printBoard()
