@@ -250,7 +250,6 @@ class Game():
                 player2.setEnemyBoard()
                 player2.setBoard()
 
-
                 players = [player1, player2]
                 for player in players:
                     for _ in range(2):
@@ -266,47 +265,8 @@ class Game():
                         player.getMove(players[i])
                         i -= 1
 
-
-
             loop()
 
-        # 	size = input('Введите размер доски (пример: 10х10): ').split('x')
-        # 	if len(size) != 2 or not size[0].isdigit() or not size[1].isdigit() or int(size[0]) > 26 or int(size[1]) > 26 or int(size[0]) <= 0 or int(size[1]) <= 0:
-        # 		print('Неверный ввод!')
-        # 		loop()
-
-        # 	else:
-        # 		players = self.setPlayers()
-        # 		board = Board(int(size[0]), int(size[1]))
-        # 		board.setBoard()
-        # 		ship_col, ship_row = board.setShip()
-        # 		done = False
-        # 		while not done:
-        # 			for name in players:
-
-        # 					clear()
-        # 					board.printBoard()
-        # 					player = Player(name, int(size[0]), int(size[1]))
-        # 					try:
-        # 						row, col = player.getMove(ship_row, ship_col)
-        # 					except TypeError:
-        # 						main()
-
-        # 					if player.status == True:
-        # 						board.changeBoardWin(row, col)
-        # 						board.printBoard()
-        # 						print('\n...Конец игры...')
-        # 						cont()
-        # 						done = True
-        # 						sys.exit()
-        # 					else:
-        # 						clear()
-        # 						board.changeBoardMiss(row, col)
-        # 						board.printBoard()
-        # 						print('\nПромах!')
-        # 						cont()
-        # 				main()
-        # loop()
 if __name__ == '__main__':
     import string, sys, os
 
