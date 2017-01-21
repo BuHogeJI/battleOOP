@@ -84,10 +84,13 @@ class Player(Board):
             ship = []
             if len(coords) > 1:
                 for i in range(len(coords) - 1):
-                    if coords[i][0] + 1 != coords[i+1][0] or coords[i][0] - 1 != coords[i+1][0] or coords[i][1] + 1 != coords[i+1][1] or coords[i][1] - 1 != coords[i+1][1]:
-                        print('Нельзя разрывать корабль!')
-                        cont()
-                        return False
+                    if coords[i][0] == coords[i+1][0] or coords[i][0] + 1 == coords[i+1][0] or coords[i][0] - 1 == coords[i+1][0]:
+                        if coords[i][1] == coords[i+1][1] or coords[i][1] + 1 == coords[i+1][1] or coords[i][1] - 1 == coords[i+1][1]:
+                            continue
+                        else:
+                            return False
+
+
             for coord in coords:
                 if checkCoord(coord):
                     ship.append(coord)
@@ -256,9 +259,11 @@ class Game():
                         clear()
                         print('Расстановка кораблей для {}'.format(player.name))
                         player.printBoard()
-                        player.setShip()
-                        for ship in player.ships:
-                            player.changeBoardShip(ship)
+                        if player.setShip() != False:
+                            for ship in player.ships:
+                                player.changeBoardShip(ship)
+                        else:
+                            print('НЕльзя размещать корабль таким образом')
                 while True:
                     i = 1
                     for player in players:
