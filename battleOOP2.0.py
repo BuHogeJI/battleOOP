@@ -76,7 +76,9 @@ class Player(Board):
                 return False
 
             for ship in self.ships:
-                if coord in ship or [coord[0] - 1, coord[1]] in ship or [coord[0], coord[1] - 1] in ship or [coord[0] - 1, coord[1] - 1] in ship or [coord[0] + 1, coord[1]] in ship or [coord[0], coord[1] + 1] in ship or [coord[0] + 1, coord[1] + 1] in ship:
+                if coord in ship or [coord[0] - 1, coord[1]] in ship or [coord[0], coord[1] - 1] in ship or \
+                                [coord[0] - 1, coord[1] - 1] in ship or [coord[0] + 1, coord[1]] in ship or \
+                                [coord[0], coord[1] + 1] in ship or [coord[0] + 1, coord[1] + 1] in ship:
                     return False
             return True
 
@@ -84,12 +86,14 @@ class Player(Board):
             ship = []
             if len(coords) > 1:
                 for i in range(len(coords) - 1):
-                    if coords[i][0] == coords[i+1][0] or coords[i][0] + 1 == coords[i+1][0] or coords[i][0] - 1 == coords[i+1][0]:
-                        if coords[i][1] == coords[i+1][1] or coords[i][1] + 1 == coords[i+1][1] or coords[i][1] - 1 == coords[i+1][1]:
-                            continue
-                        else:
+                    if coords[i][0] == coords[i+1][0]:
+                        if coords[i+1][1] - coords[i][1] != 1:
                             return False
-
+                    elif coords[i][1] == coords[i+1][1]:
+                        if coords[i+1][0] - coords[i][0] != 1:
+                            return False
+                    else:
+                        return False
 
             for coord in coords:
                 if checkCoord(coord):
@@ -238,10 +242,8 @@ class Game():
 
             def loop():
                 size = input('\nВведите размер доски (пример: 10х10): ').split('x')
-                if size == '':
-                    size = ['10', '10']
 
-                elif len(size) != 2 or not size[0].isdigit() or not size[1].isdigit() or int(size[0]) > 26 or int(size[1]) > 26 or int(size[0]) <= 0 or int(size[1]) <= 0:
+                if len(size) != 2 or not size[0].isdigit() or not size[1].isdigit() or int(size[0]) > 26 or int(size[1]) > 26 or int(size[0]) <= 0 or int(size[1]) <= 0:
                     print('Неверный ввод!')
                     loop()
 
@@ -262,6 +264,7 @@ class Game():
                         if player.setShip() != False:
                             for ship in player.ships:
                                 player.changeBoardShip(ship)
+                                player.printBoard()
                         else:
                             print('НЕльзя размещать корабль таким образом')
                 while True:
