@@ -134,7 +134,7 @@ class Player(Board):
         size = int(input('Выберите размер корабля\n1. 1-палубный\n2. 2-палубный\n3. 3-палубный\n4. 4-палубный\n\nВыбор: '))
         if size in self.choosen:
                 print('Кораблей данной категории больше нет!')
-                return False
+                return self.setShip()
         addShip(size)
 
     def getMove(self, enemy):
@@ -223,7 +223,7 @@ class Game():
                 players = [player1, player2]
                 for player in players:
                     clear()
-                    for _ in range(1):
+                    for _ in range(2):
                         print('Расстановка кораблей для {}\n'.format(player.name))
                         if player.setShip() == False:
                             cont()
