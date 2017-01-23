@@ -56,22 +56,26 @@ class Player(Board):
 
     def modCoords(self, coords):
             res = []
-            for coord in coords:
-                coord = coord.split('-')
-                coord[1] = int(coord[1]) - 1
-                i = 0
-                for letter in string.ascii_letters:
-                    if coord[0] == letter:
-                        coord[0] = i
-                        break
-                    i += 1
-                res.append([coord[0], coord[1]])
-            return res
+            try:
+                for coord in coords:
+                    coord = coord.split('-')
+                    coord[1] = int(coord[1]) - 1
+                    i = 0
+                    for letter in string.ascii_letters:
+                        if coord[0] == letter:
+                            coord[0] = i
+                            break
+                        i += 1
+                    res.append([coord[0], coord[1]])
+                return res
+            except:
+                print('Неверно введены координаты!')
+                return False
 
     def setShip(self):
 
         def checkCoord(coord):
-            if coord[0] > self.y or coord[1] > self.x or coord[0] < 0 or coord[1] < 0:
+            if coord[0] >= self.y or coord[1] >= self.x or coord[0] < 0 or coord[1] < 0:
                 return False
 
             for ship in self.ships:
@@ -94,13 +98,11 @@ class Player(Board):
                             return False
                     else:
                         return False
-
             for coord in coords:
                 if checkCoord(coord):
                     ship.append(coord)
                 else:
                     return False
-
             return ship
 
         def addShip(size):
@@ -113,13 +115,28 @@ class Player(Board):
             cont()
             for _ in range(5-size - i):
                 clear()
+                print('Расстановка кораблей для {}'.format(self.name))
                 self.printBoard()
+
                 if size == 1:
                     coords = [input('Введите координаты: ')]
-                    coords = self.modCoords(coords)
+                    if self.modCoords(coords):
+                        coords = self.modCoords(coords)
+                    else:
+                        self.choosen.remove(size)
+                        return addShip(size)
+
                 else:
                     coords = input('Введите координаты: ').split(';')
-                    coords = self.modCoords(coords)
+                    if self.modCoords(coords):
+                        coords = self.modCoords(coords)
+                    else:
+                        self.choosen.remove(size)
+                        return addShip(size)
+                if len(coords) != size:
+                    print('Неверное количество координат')
+                    cont()
+                    return addShip(size)
                 if getShip(coords) != False:
                     ship = getShip(coords)
                     self.ships.append(ship)
@@ -130,21 +147,40 @@ class Player(Board):
                     print('В выбранные координаты нельзя поставить корабль!')
                     self.choosen.remove(size)
                     return addShip(size)
-
-        size = int(input('Выберите размер корабля\n1. 1-палубный\n2. 2-палубный\n3. 3-палубный\n4. 4-палубный\n\nВыбор: '))
+        try:
+            clear()
+            print('Расстановка кораблей для {}'.format(self.name))
+            self.printBoard()
+            size = int(input('Выберите размер корабля\n1. 1-палубный\n2. 2-палубный\n3. 3-палубный\n4. 4-палубный\n\nВыбор: '))
+            if size not in range(1,5):
+                print('Необходимо ввести число от 1 до 5!')
+                cont()
+                return self.setShip()
+        except ValueError:
+            print('Необходимо ввести число!')
+            cont()
+            return self.setShip()
         if size in self.choosen:
                 print('Кораблей данной категории больше нет!')
+                cont()
                 return self.setShip()
         addShip(size)
+        if len(self.ships) == 10:
+            return True
 
     def getMove(self, enemy):
         clear()
         self.printBoard()
         move = [input('Ход игрока {} (пример ввода: а-1): '.format(self.name))]
-        move = self.modCoords(move)[0]
+        try:
+            move = self.modCoords(move)[0]
+        except TypeError:
+            cont()
+            return self.getMove(enemy)
 
-        if int(move[1]) > self.x or int(move[0]) > self.y:
+        if move[1] >= self.x or move[0] >= self.y:
             print('Вы вышли за границу поля')
+            cont()
             return self.getMove(enemy)
 
         else:
@@ -192,14 +228,9 @@ class Game():
     def startGame(self):
         clear()
         num_of_players = self.setPlayers()
+
         if num_of_players == 1:
-            def loop():
-                size = input('Введите размер доски (пример: 10х10): ').split('x')
-                if len(size) != 2 or not size[0].isdigit() or not size[1].isdigit() or int(size[0]) > 26 or int(size[1]) > 26 or int(size[0]) <= 0 or int(size[1]) <= 0:
-                    print('Неверный ввод!')
-                    loop()
-                else:
-                    pass
+            pass
 
         elif num_of_players == 2:
             player1_name = input('Введите имя (Player1): ')
@@ -210,42 +241,41 @@ class Game():
             if player2_name == '':
                 player2_name = 'Player2'
 
-            def loop():
-                size = [10, 10]
-                board = Board(size[0], size[1])
-                player1 = Player(player1_name, size[0], size[1])
-                player2 = Player(player2_name, size[0], size[1])
-                player1.setBoard()
-                player1.setEnemyBoard()
-                player2.setEnemyBoard()
-                player2.setBoard()
+            size = [10, 10]
+            board = Board(size[0], size[1])
+            player1 = Player(player1_name, size[0], size[1])
+            player2 = Player(player2_name, size[0], size[1])
+            player1.setBoard()
+            player1.setEnemyBoard()
+            player2.setEnemyBoard()
+            player2.setBoard()
+            clear()
+            players = [player1, player2]
+            for player in players:
                 clear()
-                players = [player1, player2]
-                for player in players:
-                    clear()
-                    for _ in range(2):
-                        print('Расстановка кораблей для {}\n'.format(player.name))
-                        if player.setShip() == False:
-                            cont()
-                    else:
+                for _ in range(10):
+                    if player.setShip() == True:
                         print('Все корабли для {} успешно расставлены!'.format(player.name))
                         cont()
-
-                done = False
-                while not done:
-                    i = 1
-                    for player in players:
-                        player.getMove(players[i])
-                        i -= 1
-                        if player.status == True:
-                            done = True
-                            print('\nПобедил {}'.format(player.name))
-            loop()
+                        break
+            done = False
+            while not done:
+                i = 1
+                for player in players:
+                    player.getMove(players[i])
+                    i -= 1
+                    if player.status == True:
+                        done = True
+                        cont()
+                        clear()
+                        print('   Победил {}'.format(player.name))
+                        player.printBoard()
+                        break
 
 if __name__ == '__main__':
     import string, sys, os
 
-    def cont(): return input('\n.....Введите символ чтобы продолжить.....')
+    def cont(): return input('Введите символ чтобы продолжить')
     def clear():
         if sys.platform.startswith('win'):
             return os.system('cls')
@@ -254,5 +284,5 @@ if __name__ == '__main__':
 
     game = Game()
     game.startGame()
-    input('\nКонец игры!')
+    input('Конец игры!')
 
