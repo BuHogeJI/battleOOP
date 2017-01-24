@@ -223,7 +223,7 @@ class Game():
         if num_of_players < 1 or num_of_players > 2:
             print('Необходимо ввести число от 1 до 2!')
             return self.setPlayers()
-        return int(num_of_players)
+        return num_of_players
 
     def startGame(self):
         clear()
@@ -236,10 +236,8 @@ class Game():
             player1_name = input('Введите имя (Player1): ')
             player2_name = input('Введите имя (Player2): ')
 
-            if player1_name == '':
-                player1_name = 'Player1'
-            if player2_name == '':
-                player2_name = 'Player2'
+            if player1_name == '': player1_name = 'Player1'
+            if player2_name == '': player2_name = 'Player2'
 
             size = [10, 10]
             board = Board(size[0], size[1])
