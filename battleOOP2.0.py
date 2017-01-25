@@ -165,10 +165,19 @@ class Player(Board):
                 cont()
                 return self.setShip()
         addShip(size)
-        if len(self.ships) == 10:
+        if len(self.ships) == 1:
             return True
 
     def getMove(self, enemy):
+
+        def outOfBoard(row, col):
+            if row >= self.x or col >= self.y:
+                return True
+            elif row < 0 or col < 0:
+                return True
+            else:
+                return False
+
         clear()
         self.printBoard()
         move = [input('Ход игрока {} (пример ввода: а-1): '.format(self.name))]
@@ -178,7 +187,7 @@ class Player(Board):
             cont()
             return self.getMove(enemy)
 
-        if move[1] >= self.x or move[0] >= self.y:
+        if outOfBoard(move[1], move[0]):
             print('Вы вышли за границу поля')
             cont()
             return self.getMove(enemy)
@@ -187,7 +196,15 @@ class Player(Board):
             for ship in enemy.ships:
                 if move in ship:
                     enemy.changeBoardHit(move[1], move[0])
+                    if not outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
+                    if not outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
+                    if not outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
+                    if not outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
                     self.enemy_board[move[1]][move[0]] = 'X'
+                    if not outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
+                    if not outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
+                    if not outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
+                    if not outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
                     ship.remove(move)
                     if len(ship) == 0:
                         print('\nУБИЛ!!!')
@@ -251,7 +268,7 @@ class Game():
             players = [player1, player2]
             for player in players:
                 clear()
-                for _ in range(10):
+                for _ in range(1):
                     if player.setShip() == True:
                         print('Все корабли для {} успешно расставлены!'.format(player.name))
                         cont()
