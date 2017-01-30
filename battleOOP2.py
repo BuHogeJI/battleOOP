@@ -148,16 +148,27 @@ class Player(Board):
                     return self.addShip(size)
 
     def setRandShip(self):
-        for _ in range(4):
-            coords = [[random.randint(0, 9), random.randint(0, 9)]]
-            if self.getShip(coords) != False:
-                ship = self.getShip(coords)
-                self.ships.append(ship)
-                self.changeBoardShip(ship)
-            else:
-                return self.setRandShip()
-            if len(self.ships) == 4:
-                return True
+        sizes = [4,3,2,1]
+        for size in sizes:
+            i = 0
+            while i != 5 - size:
+                first_coord = random.randint(0, 9)
+                second_coord = random.randint(0, 9)
+                position = random.randint(1, 2)
+                if size == 1:
+                    coords = [[random.randint(0, 9), random.randint(0, 9)]]
+                else:
+                    if position == 1:
+                        coords = [[first_coord + j, second_coord] for j in range(1, size+1)]
+                    elif position == 2:
+                        coords = [[first_coord, second_coord + j] for j in range(1, size+1)]
+                if self.getShip(coords) != False:
+                    ship = self.getShip(coords)
+                    self.ships.append(ship)
+                    self.changeBoardShip(ship)
+                    i += 1
+        if len(self.ships) == 10:
+            return True
 
     def setShip(self):
         try:

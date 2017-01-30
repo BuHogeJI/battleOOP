@@ -5,11 +5,11 @@ class Board():
         self.y = y
 
     def setBoard(self):
-        self.board = [['#'] * self.y for _ in range(self.x)]
+        self.board = [[u'\u00B7'] * self.y for _ in range(self.x)]
         return self.board
 
     def setEnemyBoard(self):
-        self.enemy_board = [['#'] * self.y for _ in range(self.x)]
+        self.enemy_board = [[u'\u00B7'] * self.y for _ in range(self.x)]
         return self.enemy_board
 
     def changeBoardMiss(self, row, col): self.board[row][col] = '*'
@@ -35,15 +35,15 @@ class Board():
         print('  ', end = ' ')
         for i in range(self.y):
             print (string.ascii_letters[i], end = ' ')
-        print('{:^25}'.format(' '), end = ' ')
+        print('{:^18}'.format(' '), end = ' ')
         for i in range(self.y):
             print(string.ascii_letters[i], end = ' ')
         print()
         for i,j in enumerate(self.board):
             if i < 9:
-                print('0' + str(i + 1), ' '.join(j), '{:^22}'.format(' '), '0' + str(i + 1), ' '.join(self.enemy_board[i]))
+                print('0' + str(i + 1), ' '.join(j), '{:^15}'.format(' '), '0' + str(i + 1), ' '.join(self.enemy_board[i]))
             else:
-                print(i + 1, ' '.join(j), '{:^22}'.format(' '), i + 1, ' '.join(self.enemy_board[i]))
+                print(i + 1, ' '.join(j), '{:^15}'.format(' '), i + 1, ' '.join(self.enemy_board[i]))
 
 class Player(Board):
 
@@ -147,6 +147,7 @@ class Player(Board):
                     print('В выбранные координаты нельзя поставить корабль!')
                     self.choosen.remove(size)
                     return addShip(size)
+
         try:
             clear()
             print('Расстановка кораблей для {}'.format(self.name))
@@ -300,4 +301,10 @@ if __name__ == '__main__':
     game = Game()
     game.startGame()
     input('Конец игры!')
+    # board = Board(10, 10)
+    # player = Player('pl', 10, 10)
+    # player.setBoard()
+    # player.setEnemyBoard()
+    # player.setShip()
+    # print(player.ships)
 
