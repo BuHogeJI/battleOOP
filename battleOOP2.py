@@ -45,16 +45,6 @@ class Board():
             else:
                 print(i + 1, ' '.join(j), '{:^22}'.format(' '), i + 1, ' '.join(self.enemy_board[i]))
 
-class Player(Board):
-
-    def __init__(self, name, x, y):
-        super().__init__(x, y)
-        self.name = name
-        self.ships = []
-        self.choosen = []
-        self.killed_ships = [[] for _ in range(10)]
-        self.status = False
-
     def modCoords(self, coords):
             res = []
             try:
@@ -192,16 +182,25 @@ class Player(Board):
         if len(self.ships) == 1:
             return True
 
+class Player(Board):
+
+    def __init__(self, name, x, y):
+        super().__init__(x, y)
+        self.name = name
+        self.ships = []
+        self.choosen = []
+        self.killed_ships = [[] for _ in range(10)]
+        self.status = False
+
+    def outOfBoard(self, row, col):
+        if row >= self.x or col >= self.y:
+            return True
+        elif row < 0 or col < 0:
+            return True
+        else:
+            return False
+
     def getMove(self, enemy):
-
-        def outOfBoard(row, col):
-            if row >= self.x or col >= self.y:
-                return True
-            elif row < 0 or col < 0:
-                return True
-            else:
-                return False
-
         clear()
         self.printBoard()
         move = [input('Ход игрока {} (пример ввода: а-1): '.format(self.name))]
@@ -211,7 +210,7 @@ class Player(Board):
             cont()
             return self.getMove(enemy)
 
-        if outOfBoard(move[1], move[0]):
+        if self.outOfBoard(move[1], move[0]):
             print('Вы вышли за границу поля')
             cont()
             return self.getMove(enemy)
@@ -220,28 +219,28 @@ class Player(Board):
             for i, ship in enumerate(enemy.ships):
                 if move in ship:
                     enemy.changeBoardHit(move[1], move[0])
-                    if not outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
-                    if not outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
-                    if not outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
-                    if not outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
+                    if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
+                    if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
+                    if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
+                    if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
                     self.enemy_board[move[1]][move[0]] = 'X'
-                    if not outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
-                    if not outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
-                    if not outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
-                    if not outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
+                    if not self.outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
+                    if not self.outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
+                    if not self.outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
+                    if not self.outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
                     self.killed_ships[i].append(move)
                     ship.remove(move)
                     if len(ship) == 0:
                         print('\nУБИЛ!!!')
                         for move in self.killed_ships[i]:
-                            if not outOfBoard(move[1] - 1, move[0]) and self.enemy_board[move[1] - 1][move[0]] != 'X': self.enemy_board[move[1] - 1][move[0]] = '*'
-                            if not outOfBoard(move[1], move[0] - 1) and self.enemy_board[move[1]][move[0] - 1] != 'X': self.enemy_board[move[1]][move[0] - 1] = '*'
-                            if not outOfBoard(move[1] + 1, move[0]) and self.enemy_board[move[1] + 1][move[0]] != 'X': self.enemy_board[move[1] + 1][move[0]] = '*'
-                            if not outOfBoard(move[1], move[0] + 1) and self.enemy_board[move[1]][move[0] + 1] != 'X': self.enemy_board[move[1]][move[0] + 1] = '*'
-                            if not outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
-                            if not outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
-                            if not outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
-                            if not outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
+                            if not self.outOfBoard(move[1] - 1, move[0]) and self.enemy_board[move[1] - 1][move[0]] != 'X': self.enemy_board[move[1] - 1][move[0]] = '*'
+                            if not self.outOfBoard(move[1], move[0] - 1) and self.enemy_board[move[1]][move[0] - 1] != 'X': self.enemy_board[move[1]][move[0] - 1] = '*'
+                            if not self.outOfBoard(move[1] + 1, move[0]) and self.enemy_board[move[1] + 1][move[0]] != 'X': self.enemy_board[move[1] + 1][move[0]] = '*'
+                            if not self.outOfBoard(move[1], move[0] + 1) and self.enemy_board[move[1]][move[0] + 1] != 'X': self.enemy_board[move[1]][move[0] + 1] = '*'
+                            if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
+                            if not self.outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
+                            if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
+                            if not self.outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
 
                         enemy.ships.remove(ship)
                         if len(enemy.ships) == 0:
@@ -264,6 +263,37 @@ class Player(Board):
                 self.printBoard()
                 cont()
 
+    def getCompMove(self, enemy):
+        first_coord = random.randint(0, 9)
+        second_coord = random.randint(0, 9)
+        move = [first_coord, second_coord]
+        for i, ship in enumerate(enemy.ships):
+            if move in ship:
+                enemy.changeBoardHit(move[1], move[0])
+                if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
+                if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
+                if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
+                if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
+                self.killed_ships[i].append(move)
+                ship.remove(move)
+                if len(ship) == 0:
+                    print('\nУБИЛ!!!')
+                    for move in self.killed_ships[i]:
+                        if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
+                        if not self.outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
+                        if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
+                        if not self.outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
+                    enemy.ships.remove(ship)
+                    if len(enemy.ships) == 0:
+                        self.status = True
+                        break
+                    cont()
+                return self.getCompMove(enemy)
+                break
+        else:
+            enemy.changeBoardMiss(move[1], move[0])
+            cont()
+
 class Game():
 
     def setPlayers(self):
@@ -282,7 +312,35 @@ class Game():
         num_of_players = self.setPlayers()
 
         if num_of_players == 1:
-            pass
+            player_name = input('Введите имя (Player): ')
+            if player_name == '': player_name = 'Player'
+
+            board = Board(10, 10)
+            player = Player(player_name, 10, 10)
+            computer = Player('Computer', 10, 10)
+            player.setBoard()
+            player.setEnemyBoard()
+            computer.setBoard()
+            choise = int(input('Выберите способ расстановки кораблей\n1. Руками\n2. Рандомно\nВыбор: '))
+            if choise == 1:
+                for _ in range(1):
+                    if player.setShip() == True:
+                        print('Все корабли для {} успешно расставлены!'.format(player.name))
+                        cont()
+            elif choise == 2:
+                if player.setRandShip() == True:
+                    print('True')
+                if computer.setRandShip() == True:
+                    print('True')
+            while True:
+                player.getMove(computer)
+                if player.status == True:
+                    break
+                computer.getCompMove(player)
+                if computer.status == True:
+                    break
+
+
 
         elif num_of_players == 2:
             player1_name = input('Введите имя (Player1): ')
@@ -292,11 +350,9 @@ class Game():
             if player2_name == '': player2_name = 'Player2'
 
             choise = int(input('Выберите способ расстановки кораблей\n1. Руками\n2. Рандомно\nВыбор: '))
-
-            size = [10, 10]
-            board = Board(size[0], size[1])
-            player1 = Player(player1_name, size[0], size[1])
-            player2 = Player(player2_name, size[0], size[1])
+            board = Board(10, 10)
+            player1 = Player(player1_name, 10, 10)
+            player2 = Player(player2_name, 10 ,10)
             player1.setBoard()
             player1.setEnemyBoard()
             player2.setEnemyBoard()
