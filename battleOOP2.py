@@ -145,21 +145,17 @@ class Board():
                 first_coord = random.randint(0, 9)
                 second_coord = random.randint(0, 9)
                 position = random.randint(1, 2)
-                if size == 1:
-                    coords = [[random.randint(0, 9), random.randint(0, 9)]]
+                if size == 1: coords = [[random.randint(0, 9), random.randint(0, 9)]]
                 else:
-                    if position == 1:
-                        coords = [[first_coord + j, second_coord] for j in range(1, size+1)]
-                    elif position == 2:
-                        coords = [[first_coord, second_coord + j] for j in range(1, size+1)]
+                    if position == 1: coords = [[first_coord + j, second_coord] for j in range(1, size+1)] 
+                    elif position == 2: coords = [[first_coord, second_coord + j] for j in range(1, size+1)]   
                 if self.getShip(coords) != False:
                     ship = self.getShip(coords)
                     self.ships.append(ship)
                     self.changeBoardShip(ship)
                     i += 1
-        if len(self.ships) == 10:
-            return True
-
+        if len(self.ships) == 10: return True
+            
     def setShip(self):
         try:
             clear()
@@ -179,8 +175,7 @@ class Board():
                 cont()
                 return self.setShip()
         self.addShip(size)
-        if len(self.ships) == 1:
-            return True
+        if len(self.ships) == 1: return True
 
 class Player(Board):
 
@@ -190,6 +185,8 @@ class Player(Board):
         self.ships = []
         self.choosen = []
         self.killed_ships = [[] for _ in range(10)]
+        self.hit_move = []
+        self.hit = False
         self.status = False
 
     def outOfBoard(self, row, col):
@@ -264,11 +261,23 @@ class Player(Board):
                 cont()
 
     def getCompMove(self, enemy):
-        first_coord = random.randint(0, 9)
-        second_coord = random.randint(0, 9)
-        move = [first_coord, second_coord]
+        if self.hit == True:
+            ch = ['+1', '-1', '']
+            first_coord, second_coord = eval(str(self.hit_move[0][0]) + '{}'.format(random.choice(ch))), eval(str(self.hit_move[0][1]) + '{}'.format(random.choice(ch)))
+            print(self.hit_move)
+            print(first_coord, second_coord)
+            # if not self.outOfBoard(int(first_coord), int(second_coord)): move = [int(first_coord), int(second_coord)]
+            # else:
+            #     return self.getCompMove(enemy)
+
+        else:
+            first_coord = random.randint(0, 9)
+            second_coord = random.randint(0, 9)
+            move = [first_coord, second_coord]
         for i, ship in enumerate(enemy.ships):
             if move in ship:
+                self.hit = True
+                self.hit_move.append(move)
                 enemy.changeBoardHit(move[1], move[0])
                 if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
                 if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
@@ -290,7 +299,12 @@ class Player(Board):
                     cont()
                 return self.getCompMove(enemy)
                 break
+            if enemy.board[move[1]][move[0]] == '*' or \
+               enemy.board[move[1]][move[0]] == 'X':
+                return self.getCompMove(enemy)
+                break 
         else:
+            self.hit = False
             enemy.changeBoardMiss(move[1], move[0])
             cont()
 
@@ -328,16 +342,18 @@ class Game():
                         print('Все корабли для {} успешно расставлены!'.format(player.name))
                         cont()
             elif choise == 2:
-                if player.setRandShip() == True:
-                    print('True')
-                if computer.setRandShip() == True:
-                    print('True')
+                player.setRandShip()
+                computer.setRandShip()
             while True:
                 player.getMove(computer)
                 if player.status == True:
+                    print('   Победил {}'.format(player.name))
+                    player.printBoard()
                     break
                 computer.getCompMove(player)
                 if computer.status == True:
+                    print('   Победил {}'.format(computer.name))
+                    player.printBoard()
                     break
 
 
