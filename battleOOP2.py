@@ -264,11 +264,11 @@ class Player(Board):
         if self.hit == True:
             ch = ['+1', '-1', '']
             first_coord, second_coord = eval(str(self.hit_move[0][0]) + '{}'.format(random.choice(ch))), eval(str(self.hit_move[0][1]) + '{}'.format(random.choice(ch)))
-            print(self.hit_move)
-            print(first_coord, second_coord)
-            # if not self.outOfBoard(int(first_coord), int(second_coord)): move = [int(first_coord), int(second_coord)]
-            # else:
-            #     return self.getCompMove(enemy)
+            if not self.outOfBoard(int(first_coord), int(second_coord)) and (enemy.board[int(first_coord)][int(second_coord)] != '*' \
+             or enemy.board[int(first_coord)][int(second_coord)] != 'X'):
+                move = [int(first_coord), int(second_coord)]
+            else:
+                return self.getCompMove(enemy)
 
         else:
             first_coord = random.randint(0, 9)
@@ -277,7 +277,8 @@ class Player(Board):
         for i, ship in enumerate(enemy.ships):
             if move in ship:
                 self.hit = True
-                self.hit_move.append(move)
+                self.hit_move.append(ship)
+                print(self.hit_move)
                 enemy.changeBoardHit(move[1], move[0])
                 if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
                 if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
@@ -286,6 +287,8 @@ class Player(Board):
                 self.killed_ships[i].append(move)
                 ship.remove(move)
                 if len(ship) == 0:
+                    self.hit_move.remove(ship)
+                    self.hit = False
                     print('\nУБИЛ!!!')
                     for move in self.killed_ships[i]:
                         if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
@@ -304,15 +307,14 @@ class Player(Board):
                 return self.getCompMove(enemy)
                 break 
         else:
-            self.hit = False
             enemy.changeBoardMiss(move[1], move[0])
             cont()
 
 class Game():
 
-    def setPlayers(self):
+    def setPlayers(self, message):
         try:
-            num_of_players = int(input('Введите количество игроков (1/2): '))
+            num_of_players = int(input(message))
         except ValueError:
             print('Введите число!')
             return self.setPlayers()
@@ -323,38 +325,58 @@ class Game():
 
     def startGame(self):
         clear()
-        num_of_players = self.setPlayers()
+        num_of_players = self.setPlayers('Введите количество игроков (1/2): ')
 
         if num_of_players == 1:
-            player_name = input('Введите имя (Player): ')
-            if player_name == '': player_name = 'Player'
-
+            who = self.setPlayers('1. Player vs Computer\n2. Computer vs Computer\nВыбор: ')
             board = Board(10, 10)
-            player = Player(player_name, 10, 10)
-            computer = Player('Computer', 10, 10)
-            player.setBoard()
-            player.setEnemyBoard()
-            computer.setBoard()
-            choise = int(input('Выберите способ расстановки кораблей\n1. Руками\n2. Рандомно\nВыбор: '))
-            if choise == 1:
-                for _ in range(1):
-                    if player.setShip() == True:
-                        print('Все корабли для {} успешно расставлены!'.format(player.name))
-                        cont()
-            elif choise == 2:
-                player.setRandShip()
-                computer.setRandShip()
-            while True:
-                player.getMove(computer)
-                if player.status == True:
-                    print('   Победил {}'.format(player.name))
-                    player.printBoard()
-                    break
-                computer.getCompMove(player)
-                if computer.status == True:
-                    print('   Победил {}'.format(computer.name))
-                    player.printBoard()
-                    break
+            if who == 2:
+                computer1 = Player('Computer 1', 10, 10)
+                computer2 = Player('Computer 2', 10, 10)
+                computer1.setBoard()
+                computer1.setEnemyBoard()
+                computer2.setEnemyBoard()
+                computer2.setBoard()
+                computer1.setRandShip()
+                computer2.setRandShip()
+                while True:
+                    computer1.getCompMove(computer2)
+                    if computer1.status == True:
+                        print('   Победил {}'.format(computer1.name))
+                        break
+                    computer2.getCompMove(computer1)
+                    if computer2.status == True:
+                        print('   Победил {}'.format(computer2.name))
+                        break
+            elif who == 1:
+                player_name = input('Введите имя (Player): ')
+                if player_name == '': player_name = 'Player'
+                player = Player(player_name, 10, 10)
+                computer = Player('Computer', 10, 10)
+                player.setBoard()
+                player.setEnemyBoard()
+                computer.setBoard()
+                computer.setEnemyBoard()
+                choise = int(input('Выберите способ расстановки кораблей\n1. Руками\n2. Рандомно\nВыбор: '))
+                if choise == 1:
+                    for _ in range(10):
+                        if player.setShip() == True:
+                            print('Все корабли для {} успешно расставлены!'.format(player.name))
+                            cont()
+                            break
+                    computer.setRandShip()
+                elif choise == 2:
+                    player.setRandShip()
+                    computer.setRandShip()
+                while True:
+                    player.getMove(computer)
+                    if player.status == True:
+                        print('   Победил {}'.format(player.name))
+                        break
+                    computer.getCompMove(player)
+                    if computer.status == True:
+                        print('   Победил {}'.format(computer.name))
+                        break
 
 
 
