@@ -185,7 +185,6 @@ class Player(Board):
         self.ships = []
         self.choosen = []
         self.killed_ships = [[] for _ in range(10)]
-        self.hit_move = []
         self.hit = False
         self.status = False
 
@@ -262,26 +261,28 @@ class Player(Board):
 
     def getCompMove(self, enemy):
         if self.hit == True:
-            ch = ['+1', '-1', '']
-            for hit in self.hit_move[0]:
-                first_coord, second_coord = eval(str(hit[0]) + '{}'.format(random.choice(ch))), eval(str(hit[1]) + '{}'.format(random.choice(ch)))
-                if not self.outOfBoard(int(first_coord), int(second_coord)) and (enemy.board[int(first_coord)][int(second_coord)] != '*' \
-                 or enemy.board[int(first_coord)][int(second_coord)] != 'X'):
-                    move = [int(first_coord), int(second_coord)]
+            move = False
+            for ship in self.killed_ships:
+                if len(ship) > 0:
+                    for hit in ship:
+                        first_coord, second_coord = random.choice([[hit[0]+1, hit[1]], [hit[0]-1, hit[1]], [hit[0], hit[1]+1], [hit[0], hit[1]-1]])
+                        if not self.outOfBoard(first_coord, second_coord) and (enemy.board[second_coord][first_coord] != '*' \
+                         and enemy.board[second_coord][first_coord] != 'X'):
+                            move = [first_coord, second_coord]
+                            break
+                if move:
                     break
-                else:
-                    return self.getCompMove(enemy)
+            else:
+                return self.getCompMove(enemy)
 
-        else:
+
+        elif self.hit == False:
             first_coord = random.randint(0, 9)
             second_coord = random.randint(0, 9)
             move = [first_coord, second_coord]
         for i, ship in enumerate(enemy.ships):
             if move in ship:
                 self.hit = True
-                if ship not in self.hit_move:
-                    self.hit_move.append(ship)
-                print(self.hit_move)
                 enemy.changeBoardHit(move[1], move[0])
                 if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
                 if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
@@ -290,7 +291,6 @@ class Player(Board):
                 self.killed_ships[i].append(move)
                 ship.remove(move)
                 if len(ship) == 0:
-                    self.hit_move.remove(ship)
                     self.hit = False
                     print('\nУБИЛ!!!')
                     for move in self.killed_ships[i]:
@@ -299,16 +299,13 @@ class Player(Board):
                         if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
                         if not self.outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
                     enemy.ships.remove(ship)
+                    self.killed_ships[i].clear()
                     if len(enemy.ships) == 0:
                         self.status = True
                         break
                     cont()
                 return self.getCompMove(enemy)
                 break
-            if enemy.board[move[1]][move[0]] == '*' or \
-               enemy.board[move[1]][move[0]] == 'X':
-                return self.getCompMove(enemy)
-                break 
         else:
             enemy.changeBoardMiss(move[1], move[0])
 
