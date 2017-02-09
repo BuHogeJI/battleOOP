@@ -281,6 +281,10 @@ class Player(Board):
             second_coord = random.randint(0, 9)
             move = [first_coord, second_coord]
         for i, ship in enumerate(enemy.ships):
+            if self.enemy_board[move[1]][move[0]] == '*' or \
+               self.enemy_board[move[1]][move[0]] == 'X':
+                return self.getMove(enemy)
+                break
             if move in ship:
                 self.hit = True
                 enemy.changeBoardHit(move[1], move[0])
@@ -343,6 +347,7 @@ class Game():
                     if computer1.status == True:
                         print('   Победил {}'.format(computer1.name))
                         break
+
                     computer2.getCompMove(computer1)
                     if computer2.status == True:
                         print('   Победил {}'.format(computer2.name))
@@ -423,6 +428,9 @@ class Game():
                         print('   Победил {}'.format(player.name))
                         player.printBoard()
                         break
+                    clear()
+                    print('Ход следующего игрока!')
+                    cont()
 
 if __name__ == '__main__':
     import string, random, sys, os
