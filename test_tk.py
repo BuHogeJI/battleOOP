@@ -51,22 +51,31 @@ class Sea:
 		first_coord = first_coord // 30 - 1
 		second_coord = second_coord // 30 - 1
 		print(first_coord, second_coord)
-		if self.computer.board[second_coord][first_coord - 15] == u'\u00B7': color = 'pink'
-		else:
-			for i, ship in enumerate(self.computer.ships):
-				if [second_coord, first_coord - 15] in ship:
-					self.player.killed_ships.append([second_coord, first_coord - 15])
-					ship.remove([second_coord, first_coord - 15])
-				if len(ship) == 0:
-					for move in self.player.killed_ships[i]:
-						pass
-						
-			color = 'red' 
-			self.sea.itemconfig('{}-{}'.format(first_coord + 1, second_coord - 1), fill = 'pink')
-			self.sea.itemconfig('{}-{}'.format(first_coord - 1, second_coord + 1), fill = 'pink')
-			self.sea.itemconfig('{}-{}'.format(first_coord + 1, second_coord + 1), fill = 'pink')
-			self.sea.itemconfig('{}-{}'.format(first_coord - 1, second_coord - 1), fill = 'pink')
-		self.sea.itemconfig('{}-{}'.format(first_coord, second_coord), fill = color)
+		self.player.getMove(self.computer, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord)
+		for i, col in enumerate(self.computer.board):
+			for j, row in enumerate(col):
+				if row == '*':
+					self.sea.itemconfig('{}-{}'.format(j + 15, i), fill = 'pink')
+				elif row == 'X':
+					self.sea.itemconfig('{}-{}'.format(j + 15, i), fill = 'red')
+				else:
+					self.sea.itemconfig('{}-{}'.format(j + 15, i), fill = 'white')
+		# if self.computer.board[second_coord][first_coord - 15] == u'\u00B7': color = 'pink'
+		# else:
+		# 	for i, ship in enumerate(self.computer.ships):
+		# 		if [second_coord, first_coord - 15] in ship:
+		# 			self.player.killed_ships.append([second_coord, first_coord - 15])
+		# 			ship.remove([second_coord, first_coord - 15])
+		# 		if len(ship) == 0:
+		# 			for move in self.player.killed_ships[i]:
+		# 				pass
+		#
+		# 	color = 'red'
+		# 	self.sea.itemconfig('{}-{}'.format(first_coord + 1, second_coord - 1), fill = 'pink')
+		# 	self.sea.itemconfig('{}-{}'.format(first_coord - 1, second_coord + 1), fill = 'pink')
+		# 	self.sea.itemconfig('{}-{}'.format(first_coord + 1, second_coord + 1), fill = 'pink')
+		# 	self.sea.itemconfig('{}-{}'.format(first_coord - 1, second_coord - 1), fill = 'pink')
+		# self.sea.itemconfig('{}-{}'.format(first_coord, second_coord), fill = color)
 
 		
 

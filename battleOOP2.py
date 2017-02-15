@@ -246,22 +246,24 @@ class Player(Board):
                     if len(enemy.ships) == 0:
                         self.status = True
                         break
-                    cont()
-                return self.getMove(enemy)
-                break
+                if option == 'gui':
+                    return True
+                elif option == 'console':
+                    return self.getMove(enemy)
+                    break
 
             if self.enemy_board[move[1]][move[0]] == '*' or \
                self.enemy_board[move[1]][move[0]] == 'X':
                 print('Туда ты уже стрелял!')
-                cont()
-                return self.getMove(enemy)
-                break
+                if option == 'gui':
+                    pass
+                elif option == 'console':
+                    return self.getMove(enemy)
+                    break
         else:
             self.enemy_board[move[1]][move[0]] = '*'
             enemy.changeBoardMiss(move[1], move[0])
-            clear()
             self.printBoard()
-            cont()
 
     def getCompMove(self, enemy):
         if self.hit == True:
