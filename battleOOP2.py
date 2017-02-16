@@ -1,5 +1,3 @@
-import string, random, sys, os
-
 class Board():
 
     def __init__(self, x, y):
@@ -17,6 +15,9 @@ class Board():
     def changeBoardMiss(self, row, col): self.board[row][col] = '*'
 
     def changeBoardHit(self, row, col): self.board[row][col] = 'X'
+
+    def changeBoardMissDiagonal(self, move):
+        pass
 
     def changeBoardShip(self, ship):
         if len(ship) == 1:
@@ -263,7 +264,9 @@ class Player(Board):
         else:
             self.enemy_board[move[1]][move[0]] = '*'
             enemy.changeBoardMiss(move[1], move[0])
+            clear()
             self.printBoard()
+            cont()
 
     def getCompMove(self, enemy):
         if self.hit == True:
@@ -438,7 +441,81 @@ class Game():
                     print('Ход следующего игрока!')
                     cont()
 
+class Gui():
+
+    def makeCanvas(self):
+        self.canvas = Canvas(root, width = 830, height = 500, bg = 'lightblue', cursor = 'plus')
+        self.canvas.bind('<Button-1>', self.move)
+        self.canvas.pack()
+        
+    def setPlayers(self):
+        board = Board(10, 10)
+        self.player1 = Player('Player1', 10, 10)
+        self.player1.setBoard()
+        self.player1.setEnemyBoard()
+        self.player1.setRandShip()
+        self.player1.flag = True
+        self.player2 = Player('Player2', 10, 10)
+        self.player2.setBoard()
+        self.player2.setEnemyBoard()
+        self.player2.setRandShip()
+        self.player2.flag = False
+        return self.player1, self.player2
+
+    def makeBoard(self, player):
+        y = 30
+        for row in player.board:
+            x = 30
+            for col in row:
+                if col == u'\u00B7': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'blue', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                else: self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'brown', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                x += 30
+            y += 30
+
+    def makeEnemyBoard(self, player):
+        y = 30
+        for row in player.enemy_board:
+            x = 500
+            for col in row:
+                self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'blue', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                x += 30
+            y += 30
+
+    def move(self, event):
+        first_coord = event.x
+        second_coord = event.y
+        y = 30
+        for row in self.player2.board:
+            x = 500
+            for col in row:
+                if first_coord > x and first_coord < x + 30: first_coord = x
+                if second_coord > y and second_coord < y + 30: second_coord = y
+                x += 30
+            y += 30
+        first_coord = first_coord // 30 - 1
+        second_coord = second_coord // 30 - 1  
+        if self.player1.flag == True:
+            move = [first_coord - 15, second_coord]
+            print(move)
+            for ship in self.player2.ships:
+                if move in ship:
+                    self.player2.changeBoardHit(move[1], move[0])
+                    break
+            else:
+                self.player2.changeBoardMiss(move[1], move[0])
+
+            for j, row in enumerate(self.player2.board):
+                for i, col in enumerate(row):
+                    if col == '*': self.canvas.itemconfig('{}-{}'.format(i + 15, j), fill = 'lightgreen')
+                    elif col == 'X': self.canvas.itemconfig('{}-{}'.format(i + 15, j), fill = 'red')
+
+
+
+
+
 if __name__ == '__main__':
+    import string, random, sys, os
+    from tkinter import *
 
     def cont(): return input('Введите символ чтобы продолжить')
     def clear():
@@ -447,7 +524,23 @@ if __name__ == '__main__':
         else:
             return os.system('clear')
 
-    game = Game()
-    game.startGame()
-    input('Конец игры!')
+    mode = input('Do you want to use GUI?(y/n): ')
+
+    if mode == 'y' or mode == 'yes' or mode == '':
+        
+        root = Tk()
+
+        gui = Gui()
+        gui.makeCanvas()
+        players = gui.setPlayers()
+        gui.makeBoard(players[0])
+        gui.makeEnemyBoard(players[0])
+
+        root.mainloop()
+
+
+    else:
+        game = Game()
+        game.startGame()
+        input('Конец игры!')
 
