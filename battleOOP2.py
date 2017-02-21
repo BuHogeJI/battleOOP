@@ -516,8 +516,8 @@ class Gui():
             x = 30
             for col in row:
                 if col == u'\u00B7': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'blue', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
-                elif col == 'X': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'green', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
-                elif col == '*': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'red', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                elif col == 'X': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'lightgreen', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                elif col == '*': self.canvas.create_oval(x + 10, y + 10, x + 20, y + 20, fill = 'gray', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
                 else: self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'yellow', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
                 x += 30
             y += 30
@@ -528,8 +528,8 @@ class Gui():
             x = 500
             for col in row:
                 if col == u'\u00B7': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'blue', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
-                elif col == 'X': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'green', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
-                else: self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'red', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                elif col == 'X': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'lightgreen', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                else: self.canvas.create_oval(x + 10, y + 10, x + 20, y + 20, fill = 'gray', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
                 x += 30
             y += 30
 
