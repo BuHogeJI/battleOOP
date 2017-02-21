@@ -276,7 +276,7 @@ class Player(Board):
             elif option == 'gui':
                 return False
 
-    def getCompMove(self, enemy):
+    def getCompMove(self, enemy, option = 'console'):
         if self.hit == True:
             move = False
             for ship in self.killed_ships:
@@ -290,6 +290,8 @@ class Player(Board):
                 if move:
                     break
             else:
+                if option == 'gui':
+                    self.getCompMove(enemy, option = 'gui')
                 return self.getCompMove(enemy)
 
 
@@ -300,6 +302,8 @@ class Player(Board):
         for i, ship in enumerate(enemy.ships):
             if self.enemy_board[move[1]][move[0]] == '*' or \
                self.enemy_board[move[1]][move[0]] == 'X':
+                if option == 'gui':
+                    self.getCompMove(enemy, option = 'gui')
                 return self.getMove(enemy)
                 break
             if move in ship:
@@ -324,11 +328,14 @@ class Player(Board):
                     if len(enemy.ships) == 0:
                         self.status = True
                         break
-                    cont()
+                if option == 'gui':
+                    self.getCompMove(enemy, option = 'gui')        
                 return self.getCompMove(enemy)
                 break
         else:
             enemy.changeBoardMiss(move[1], move[0])
+            if option == 'gui':
+                return False
 
 class Game():
 
@@ -451,9 +458,10 @@ class Game():
 
 class Gui():
 
-    def makeCanvas(self):
+    def __init__(self):
         self.canvas = Canvas(root, width = 830, height = 500, bg = 'lightblue', cursor = 'plus')
         self.canvas.bind('<Button-1>', self.move)
+        self.num_of_players = None
         self.canvas.pack()
 
     def makeBaner(self):
@@ -466,7 +474,7 @@ class Gui():
         baner.wait_window()
 
         
-    def setPlayers(self):
+    def setPlayersForTwo(self):
         board = Board(10, 10)
         self.player1 = Player('Player1', 10, 10)
         self.player1.setBoard()
@@ -482,7 +490,20 @@ class Gui():
         self.makeEnemyBoard(self.player2)
         self.makeBoard(self.player1)
         self.makeEnemyBoard(self.player1)
-        return self.player1, self.player2
+
+    def setPlayer(self):
+        board = Board(10, 10)
+        self.player1 = Player('Player', 10 ,10)
+        self.player1.setBoard()
+        self.player1.setEnemyBoard()
+        self.player1.setRandShip()
+        self.player1.flag = True
+        self.computer = Player('Computer', 10, 10)
+        self.computer.setBoard()
+        self.computer.setEnemyBoard()
+        self.computer.setRandShip()
+        self.makeBoard(self.player1)
+        self.makeEnemyBoard(self.player1)
 
     def makeBoard(self, player):
         y = 30
@@ -507,11 +528,19 @@ class Gui():
                 x += 30
             y += 30
 
+    def one_player(self):
+        self.setPlayer()
+        self.num_of_players = 1
+
+    def two_players(self):
+        self.setPlayersForTwo()
+        self.num_of_players = 2
+
     def move(self, event):
         first_coord = event.x
         second_coord = event.y
         y = 30
-        for row in self.player2.board:
+        for row in self.player1.board:
             x = 500
             for col in row:
                 if first_coord > x and first_coord < x + 30: first_coord = x
@@ -521,32 +550,50 @@ class Gui():
         first_coord = first_coord // 30 - 1
         second_coord = second_coord // 30 - 1  
         print(first_coord, second_coord)
-        if self.player1.flag == True:
-            if self.player1.getMove(self.player2, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
-                self.player1.flag = False
-                self.player2.flag = True
-                self.makeBoard(self.player1)
-                self.makeEnemyBoard(self.player1)
-                self.makeBaner()
-                self.makeBoard(self.player2)
-                self.makeEnemyBoard(self.player2)
-            else:
-                self.makeBoard(self.player1)
-                self.makeEnemyBoard(self.player1)
+        if self.num_of_players == 2:
+            if self.player1.flag == True:
+                if self.player1.getMove(self.player2, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
+                    self.player1.flag = False
+                    self.player2.flag = True
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
+                    self.makeBaner()
+                    self.makeBoard(self.player2)
+                    self.makeEnemyBoard(self.player2)
+                else:
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
 
-        elif self.player2.flag == True:
-            if self.player2.getMove(self.player1, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
-                self.player2.flag = False
-                self.player1.flag = True
-                self.makeBoard(self.player2)
-                self.makeEnemyBoard(self.player2)
-                self.makeBaner()
-                self.makeBoard(self.player1)
-                self.makeEnemyBoard(self.player1)
-            else:
-                self.makeBoard(self.player2)
-                self.makeEnemyBoard(self.player2)
+            elif self.player2.flag == True:
+                if self.player2.getMove(self.player1, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
+                    self.player2.flag = False
+                    self.player1.flag = True
+                    self.makeBoard(self.player2)
+                    self.makeEnemyBoard(self.player2)
+                    self.makeBaner()
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
+                else:
+                    self.makeBoard(self.player2)
+                    self.makeEnemyBoard(self.player2)
 
+        elif self.num_of_players == 1:
+            if self.player1.flag == True:
+                if self.player1.getMove(self.computer, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
+                    self.player1.flag = False
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
+                else:
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
+            else:
+                if self.computer.getCompMove(self.player1, option = 'gui') == False:
+                    self.player1.flag = True
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
+                else:
+                    self.makeBoard(self.player1)
+                    self.makeEnemyBoard(self.player1)
 
 
 
@@ -565,21 +612,23 @@ if __name__ == '__main__':
     mode = input('Do you want to use GUI?(y/n): ')
 
     if mode == 'y' or mode == 'yes' or mode == '':
-        one_time = True
-        
+
+        def one_player(): gui.one_player()
+        def two_players(): gui.two_players()
+            
         root = Tk()
+        root.resizable(False, False)
 
         gui = Gui()
-        gui.makeCanvas()
 
-        if one_time:
-            gui.setPlayers()
-            one_time = False
-
-        root.resizable(False, False)
+        menu = Menu(root)
+        root.config(menu = menu)
+        first_m = Menu(menu)
+        menu.add_cascade(label = 'Новая игра', menu = first_m)
+        first_m.add_command(label = '1 игрок', command = one_player)
+        first_m.add_command(label = '2 игрока', command = two_players)
         
         root.mainloop()
-
 
     else:
         game = Game()
