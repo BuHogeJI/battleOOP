@@ -291,8 +291,9 @@ class Player(Board):
                     break
             else:
                 if option == 'gui':
-                    self.getCompMove(enemy, option = 'gui')
-                return self.getCompMove(enemy)
+                    return self.getCompMove(enemy, option = 'gui')
+                elif option == 'console':
+                    return self.getCompMove(enemy)
 
 
         elif self.hit == False:
@@ -303,9 +304,11 @@ class Player(Board):
             if self.enemy_board[move[1]][move[0]] == '*' or \
                self.enemy_board[move[1]][move[0]] == 'X':
                 if option == 'gui':
-                    self.getCompMove(enemy, option = 'gui')
-                return self.getMove(enemy)
-                break
+                    return self.getCompMove(enemy, option = 'gui')
+                    break
+                elif option == 'console':
+                    return self.getMove(enemy)
+                    break
             if move in ship:
                 self.hit = True
                 enemy.changeBoardHit(move[1], move[0])
@@ -329,9 +332,11 @@ class Player(Board):
                         self.status = True
                         break
                 if option == 'gui':
-                    self.getCompMove(enemy, option = 'gui')        
-                return self.getCompMove(enemy)
-                break
+                    return self.getCompMove(enemy, option = 'gui')    
+                    break    
+                elif option == 'console':
+                    return self.getCompMove(enemy)
+                    break
         else:
             enemy.changeBoardMiss(move[1], move[0])
             if option == 'gui':
@@ -583,20 +588,17 @@ class Gui():
                     self.player1.flag = False
                     self.makeBoard(self.player1)
                     self.makeEnemyBoard(self.player1)
+                    if self.computer.getCompMove(self.player1, option = 'gui') == False:
+                        self.player1.flag = True
+                        self.makeBoard(self.player1)
+                        self.makeEnemyBoard(self.player1)
+                    else:
+                        self.makeBoard(self.player1)
+                        self.makeEnemyBoard(self.player1)
                 else:
-                    self.makeBoard(self.player1)
-                    self.makeEnemyBoard(self.player1)
-            else:
-                if self.computer.getCompMove(self.player1, option = 'gui') == False:
                     self.player1.flag = True
                     self.makeBoard(self.player1)
                     self.makeEnemyBoard(self.player1)
-                else:
-                    self.makeBoard(self.player1)
-                    self.makeEnemyBoard(self.player1)
-
-
-
 
 if __name__ == '__main__':
     import string, random, sys, os
