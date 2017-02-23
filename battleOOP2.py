@@ -21,7 +21,6 @@ class Board():
         if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
         if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
         if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
-        self.enemy_board[move[1]][move[0]] = 'X'
         if not self.outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
         if not self.outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
         if not self.outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
@@ -238,6 +237,7 @@ class Player(Board):
         for i, ship in enumerate(enemy.ships):
             if move in ship:
                 enemy.changeBoardHit(move[1], move[0])
+                self.enemy_board[move[1]][move[0]] = 'X'
                 self.changeBoardMissDiagonal(move, enemy)
                 self.killed_ships[i].append(move)
                 ship.remove(move)
@@ -320,6 +320,7 @@ class Player(Board):
                     self.hit = False
                     print('\nУБИЛ!!!')
                     for move in self.killed_ships[i]:
+                        self.enemy_board[move[1]][move[0]] = 'X'
                         self.changeBoardKill(move, enemy)
                     enemy.ships.remove(ship)
                     self.killed_ships[i].clear()
