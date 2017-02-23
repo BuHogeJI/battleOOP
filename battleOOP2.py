@@ -16,8 +16,26 @@ class Board():
 
     def changeBoardHit(self, row, col): self.board[row][col] = 'X'
 
-    def changeBoardMissDiagonal(self, move):
-        pass
+    def changeBoardMissDiagonal(self, move, enemy):
+        if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
+        if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
+        if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
+        if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
+        self.enemy_board[move[1]][move[0]] = 'X'
+        if not self.outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
+        if not self.outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
+        if not self.outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
+        if not self.outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
+
+    def changeBoardKill(self, move, enemy):
+        if not self.outOfBoard(move[1] - 1, move[0]) and self.enemy_board[move[1] - 1][move[0]] != 'X': self.enemy_board[move[1] - 1][move[0]] = '*'
+        if not self.outOfBoard(move[1], move[0] - 1) and self.enemy_board[move[1]][move[0] - 1] != 'X': self.enemy_board[move[1]][move[0] - 1] = '*'
+        if not self.outOfBoard(move[1] + 1, move[0]) and self.enemy_board[move[1] + 1][move[0]] != 'X': self.enemy_board[move[1] + 1][move[0]] = '*'
+        if not self.outOfBoard(move[1], move[0] + 1) and self.enemy_board[move[1]][move[0] + 1] != 'X': self.enemy_board[move[1]][move[0] + 1] = '*'
+        if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
+        if not self.outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
+        if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
+        if not self.outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
 
     def changeBoardShip(self, ship):
         if len(ship) == 1:
@@ -220,29 +238,13 @@ class Player(Board):
         for i, ship in enumerate(enemy.ships):
             if move in ship:
                 enemy.changeBoardHit(move[1], move[0])
-                if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
-                if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
-                if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
-                if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
-                self.enemy_board[move[1]][move[0]] = 'X'
-                if not self.outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
-                if not self.outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
-                if not self.outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
-                if not self.outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
+                self.changeBoardMissDiagonal(move, enemy)
                 self.killed_ships[i].append(move)
                 ship.remove(move)
                 if len(ship) == 0:
                     print('\nУБИЛ!!!')
                     for move in self.killed_ships[i]:
-                        if not self.outOfBoard(move[1] - 1, move[0]) and self.enemy_board[move[1] - 1][move[0]] != 'X': self.enemy_board[move[1] - 1][move[0]] = '*'
-                        if not self.outOfBoard(move[1], move[0] - 1) and self.enemy_board[move[1]][move[0] - 1] != 'X': self.enemy_board[move[1]][move[0] - 1] = '*'
-                        if not self.outOfBoard(move[1] + 1, move[0]) and self.enemy_board[move[1] + 1][move[0]] != 'X': self.enemy_board[move[1] + 1][move[0]] = '*'
-                        if not self.outOfBoard(move[1], move[0] + 1) and self.enemy_board[move[1]][move[0] + 1] != 'X': self.enemy_board[move[1]][move[0] + 1] = '*'
-                        if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
-                        if not self.outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
-                        if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
-                        if not self.outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
-
+                        self.changeBoardKill(move, enemy)
                     enemy.ships.remove(ship)
                     if len(enemy.ships) == 0:
                         self.status = True
@@ -311,29 +313,14 @@ class Player(Board):
             if move in ship:
                 self.hit = True
                 enemy.changeBoardHit(move[1], move[0])
-                if not self.outOfBoard(move[1] - 1, move[0] - 1): enemy.changeBoardMiss(move[1] - 1, move[0] - 1)
-                if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
-                if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
-                if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
-                self.enemy_board[move[1]][move[0]] = 'X'
-                if not self.outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
-                if not self.outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
-                if not self.outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
-                if not self.outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
+                self.changeBoardMissDiagonal(move, enemy)
                 self.killed_ships[i].append(move)
                 ship.remove(move)
                 if len(ship) == 0:
                     self.hit = False
                     print('\nУБИЛ!!!')
                     for move in self.killed_ships[i]:
-                        if not self.outOfBoard(move[1] - 1, move[0]) and self.enemy_board[move[1] - 1][move[0]] != 'X': self.enemy_board[move[1] - 1][move[0]] = '*'
-                        if not self.outOfBoard(move[1], move[0] - 1) and self.enemy_board[move[1]][move[0] - 1] != 'X': self.enemy_board[move[1]][move[0] - 1] = '*'
-                        if not self.outOfBoard(move[1] + 1, move[0]) and self.enemy_board[move[1] + 1][move[0]] != 'X': self.enemy_board[move[1] + 1][move[0]] = '*'
-                        if not self.outOfBoard(move[1], move[0] + 1) and self.enemy_board[move[1]][move[0] + 1] != 'X': self.enemy_board[move[1]][move[0] + 1] = '*'
-                        if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
-                        if not self.outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
-                        if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
-                        if not self.outOfBoard(move[1], move[0] + 1) and enemy.board[move[1]][move[0] + 1] != 'X': enemy.changeBoardMiss(move[1], move[0] + 1)
+                        self.changeBoardKill(move, enemy)
                     enemy.ships.remove(ship)
                     self.killed_ships[i].clear()
                     if len(enemy.ships) == 0:
@@ -419,8 +406,6 @@ class Game():
                         print('   Победил {}'.format(computer.name))
                         break
 
-
-
         elif num_of_players == 2:
             player1_name = input('Введите имя (Player1): ')
             player2_name = input('Введите имя (Player2): ')
@@ -486,8 +471,7 @@ class Gui():
         baner.grab_set()
         baner.wait_window()
 
-        
-    def setPlayersForTwo(self):
+    def setPlayers(self, number):
         board = Board(10, 10)
         self.player1 = Player('Player1', 10, 10)
         self.player1.setBoard()
@@ -499,26 +483,13 @@ class Gui():
         self.player2.setEnemyBoard()
         self.player2.setRandShip()
         self.player2.flag = False
-        self.makeBoard(self.player2)
-        self.makeEnemyBoard(self.player2)
-        self.makeBoard(self.player1)
-        self.makeEnemyBoard(self.player1)
-
-    def setPlayer(self):
-        board = Board(10, 10)
-        self.player1 = Player('Player', 10 ,10)
-        self.player1.setBoard()
-        self.player1.setEnemyBoard()
-        self.player1.setRandShip()
-        self.player1.flag = True
-        self.computer = Player('Computer', 10, 10)
-        self.computer.setBoard()
-        self.computer.setEnemyBoard()
-        self.computer.setRandShip()
-        self.makeBoard(self.player1)
-        self.makeEnemyBoard(self.player1)
-        for row in self.computer.board:
-            print(row)
+        if number == 1:
+            self.player2.name = 'Computer'
+            self.makeBoard(self.player1)
+            self.makeEnemyBoard(self.player1)
+        elif number == 2:
+            self.makeBoard(self.player1)
+            self.makeEnemyBoard(self.player1)
 
     def makeBoard(self, player):
         y = 30
@@ -544,11 +515,11 @@ class Gui():
             y += 30
 
     def one_player(self):
-        self.setPlayer()
+        self.setPlayers(1)
         self.num_of_players = 1
 
     def two_players(self):
-        self.setPlayersForTwo()
+        self.setPlayers(2)
         self.num_of_players = 2
 
     def game_over(self, winner):
@@ -560,7 +531,6 @@ class Gui():
         baner.focus_set()
         baner.grab_set()
         baner.wait_window()
-
 
     def move(self, event):
         first_coord = event.x
@@ -575,7 +545,6 @@ class Gui():
             y += 30
         first_coord = first_coord // 30 - 1
         second_coord = second_coord // 30 - 1  
-        print(first_coord, second_coord)
         if self.num_of_players == 2:
             if self.player1.flag == True:
                 if self.player1.getMove(self.player2, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
@@ -605,19 +574,19 @@ class Gui():
 
         elif self.num_of_players == 1:
             if self.player1.flag == True:
-                if self.player1.getMove(self.computer, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
+                if self.player1.getMove(self.player2, option = 'gui', first_coord = first_coord - 15, second_coord = second_coord) == False:
                     self.player1.flag = False
                     self.makeBoard(self.player1)
                     self.makeEnemyBoard(self.player1)
-                    if self.computer.getCompMove(self.player1, option = 'gui') == False:
+                    if self.player2.getCompMove(self.player1, option = 'gui') == False:
                         self.player1.flag = True
                         self.makeBoard(self.player1)
                         self.makeEnemyBoard(self.player1)
                     else:
                         self.makeBoard(self.player1)
                         self.makeEnemyBoard(self.player1)
-                        if self.computer.status == True:
-                            self.game_over(self.computer)
+                        if self.player2.status == True:
+                            self.game_over(self.player2)
                 else:
                     self.player1.flag = True
                     self.makeBoard(self.player1)
