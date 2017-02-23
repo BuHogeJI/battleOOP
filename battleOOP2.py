@@ -283,8 +283,8 @@ class Player(Board):
                 if len(ship) > 0:
                     for hit in ship:
                         first_coord, second_coord = random.choice([[hit[0]+1, hit[1]], [hit[0]-1, hit[1]], [hit[0], hit[1]+1], [hit[0], hit[1]-1]])
-                        if not self.outOfBoard(first_coord, second_coord) and (enemy.board[second_coord][first_coord] != '*' \
-                         and enemy.board[second_coord][first_coord] != 'X'):
+                        if (not self.outOfBoard(first_coord, second_coord)) and (enemy.board[second_coord][first_coord] != '*') \
+                         and (enemy.board[second_coord][first_coord] != 'X'):
                             move = [first_coord, second_coord]
                             break
                 if move:
@@ -294,7 +294,6 @@ class Player(Board):
                     return self.getCompMove(enemy, option = 'gui')
                 elif option == 'console':
                     return self.getCompMove(enemy)
-
 
         elif self.hit == False:
             first_coord = random.randint(0, 9)
@@ -316,12 +315,21 @@ class Player(Board):
                 if not self.outOfBoard(move[1] + 1, move[0] + 1): enemy.changeBoardMiss(move[1] + 1, move[0] + 1)
                 if not self.outOfBoard(move[1] - 1, move[0] + 1): enemy.changeBoardMiss(move[1] - 1, move[0] + 1)
                 if not self.outOfBoard(move[1] + 1, move[0] - 1): enemy.changeBoardMiss(move[1] + 1, move[0] - 1)
+                self.enemy_board[move[1]][move[0]] = 'X'
+                if not self.outOfBoard(move[1] - 1, move[0] - 1): self.enemy_board[move[1] - 1][move[0] - 1] = '*'
+                if not self.outOfBoard(move[1] + 1, move[0] + 1): self.enemy_board[move[1] + 1][move[0] + 1] = '*'
+                if not self.outOfBoard(move[1] - 1, move[0] + 1): self.enemy_board[move[1] - 1][move[0] + 1] = '*'
+                if not self.outOfBoard(move[1] + 1, move[0] - 1): self.enemy_board[move[1] + 1][move[0] - 1] = '*'
                 self.killed_ships[i].append(move)
                 ship.remove(move)
                 if len(ship) == 0:
                     self.hit = False
                     print('\nУБИЛ!!!')
                     for move in self.killed_ships[i]:
+                        if not self.outOfBoard(move[1] - 1, move[0]) and self.enemy_board[move[1] - 1][move[0]] != 'X': self.enemy_board[move[1] - 1][move[0]] = '*'
+                        if not self.outOfBoard(move[1], move[0] - 1) and self.enemy_board[move[1]][move[0] - 1] != 'X': self.enemy_board[move[1]][move[0] - 1] = '*'
+                        if not self.outOfBoard(move[1] + 1, move[0]) and self.enemy_board[move[1] + 1][move[0]] != 'X': self.enemy_board[move[1] + 1][move[0]] = '*'
+                        if not self.outOfBoard(move[1], move[0] + 1) and self.enemy_board[move[1]][move[0] + 1] != 'X': self.enemy_board[move[1]][move[0] + 1] = '*'
                         if not self.outOfBoard(move[1] - 1, move[0]) and enemy.board[move[1] - 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] - 1, move[0])
                         if not self.outOfBoard(move[1], move[0] - 1) and enemy.board[move[1]][move[0] - 1] != 'X': enemy.changeBoardMiss(move[1], move[0] - 1)
                         if not self.outOfBoard(move[1] + 1, move[0]) and enemy.board[move[1] + 1][move[0]] != 'X': enemy.changeBoardMiss(move[1] + 1, move[0])
@@ -509,6 +517,8 @@ class Gui():
         self.computer.setRandShip()
         self.makeBoard(self.player1)
         self.makeEnemyBoard(self.player1)
+        for row in self.computer.board:
+            print(row)
 
     def makeBoard(self, player):
         y = 30
@@ -529,7 +539,7 @@ class Gui():
             for col in row:
                 if col == u'\u00B7': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'blue', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
                 elif col == 'X': self.canvas.create_rectangle(x, y, x + 30, y + 30, fill = 'lightgreen', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
-                else: self.canvas.create_oval(x + 10, y + 10, x + 20, y + 20, fill = 'gray', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
+                elif col == '*': self.canvas.create_oval(x + 10, y + 10, x + 20, y + 20, fill = 'gray', tag = '{}-{}'.format(x // 30 - 1, y // 30 - 1))
                 x += 30
             y += 30
 
@@ -540,6 +550,17 @@ class Gui():
     def two_players(self):
         self.setPlayersForTwo()
         self.num_of_players = 2
+
+    def game_over(self, winner):
+        baner = Toplevel()
+        baner.geometry('500x200+100+100')
+        Label(baner, text = 'Конец игры!').pack()
+        Label(baner, text = 'Победил - {}'.format(winner.name)).pack()
+        Button(baner, text = 'Нажми, чтобы выйти!', command = root.destroy).pack()
+        baner.focus_set()
+        baner.grab_set()
+        baner.wait_window()
+
 
     def move(self, event):
         first_coord = event.x
@@ -595,10 +616,14 @@ class Gui():
                     else:
                         self.makeBoard(self.player1)
                         self.makeEnemyBoard(self.player1)
+                        if self.computer.status == True:
+                            self.game_over(self.computer)
                 else:
                     self.player1.flag = True
                     self.makeBoard(self.player1)
                     self.makeEnemyBoard(self.player1)
+                    if self.player1.status == True:
+                        self.game_over(self.player1)
 
 if __name__ == '__main__':
     import string, random, sys, os
@@ -629,6 +654,7 @@ if __name__ == '__main__':
         menu.add_cascade(label = 'Новая игра', menu = first_m)
         first_m.add_command(label = '1 игрок', command = one_player)
         first_m.add_command(label = '2 игрока', command = two_players)
+        first_m.add_command(label = 'Выход', command = root.destroy)
         
         root.mainloop()
 
